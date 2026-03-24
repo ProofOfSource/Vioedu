@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đấu Trường VioEdu - Khối 5 (Vòng Khu Vực)</title>
+    <style>
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #eef2f3; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 35px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); position: relative; z-index: 10; }
+        h1 { text-align: center; color: #1565c0; margin-bottom: 5px; font-size: 30px; text-transform: uppercase; letter-spacing: 1px; }
+        h2 { text-align: center; color: #ef6c00; margin-top: 0; margin-bottom: 25px; font-size: 18px; font-weight: normal; }
+        
+        .header-info { display: flex; justify-content: space-between; align-items: center; background: #f3e5f5; padding: 15px 25px; border-radius: 8px; margin-bottom: 30px; font-weight: bold; font-size: 18px; border-left: 5px solid #ab47bc; }
+        .timer { color: #d32f2f; font-size: 26px; display: flex; align-items: center; gap: 8px; font-family: monospace; }
+        
+        .question-card { background: #fafafa; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e0e0e0; transition: 0.3s; }
+        .question-card:hover { border-color: #2196f3; box-shadow: 0 4px 8px rgba(33,150,243,0.1); }
+        .question-title { font-size: 18px; font-weight: 600; margin-bottom: 15px; color: #2c3e50; line-height: 1.5; }
+        
+        .options { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .options label { display: flex; align-items: center; padding: 14px; background: #fff; border: 1px solid #cfd8dc; border-radius: 6px; cursor: pointer; transition: all 0.2s; font-size: 16px; }
+        .options label:hover { background: #e3f2fd; border-color: #64b5f6; }
+        input[type="radio"] { margin-right: 12px; transform: scale(1.4); cursor: pointer; accent-color: #1976d2; }
+        
+        .btn-submit { width: 100%; padding: 16px; font-size: 20px; font-weight: bold; color: white; background-color: #2e7d32; border: none; border-radius: 8px; cursor: pointer; margin-top: 25px; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
+        .btn-submit:hover { background-color: #1b5e20; }
+        
+        #result { display: none; text-align: center; margin-top: 30px; padding: 25px; border-radius: 8px; font-size: 24px; font-weight: bold; line-height: 1.6; }
+        #confettiCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; display: none; }
+        
+        .correct-ans { background: #c8e6c9 !important; border-color: #4caf50 !important; color: #1b5e20; font-weight: bold; }
+        .wrong-ans { background: #ffcdd2 !important; border-color: #f44336 !important; color: #b71c1c; text-decoration: line-through; }
+
+        .subject-badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; color: white; margin-right: 8px; vertical-align: middle; }
+        .bg-math { background-color: #1976d2; }
+        .bg-viet { background-color: #e53935; }
+        .bg-logic { background-color: #fb8c00; }
+
+        @media (max-width: 768px) {
+            .options { grid-template-columns: 1fr; }
+            .header-info { flex-direction: column; gap: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="confettiCanvas"></canvas>
+    <div class="container">
+        <h1>Đề Thi Tổng Hợp (Mô Phỏng)</h1>
+        <h2>Vòng Khu vực & Thành phố - Lớp 5</h2>
+        
+        <div class="header-info">
+            <div>Phân môn: Toán, Tiếng Việt, Logic</div>
+            <div class="timer" id="timeDisplay">⏱ 20:00</div>
+            <div>Tổng số câu: 30</div>
+        </div>
+
+        <div id="quizContainer"></div>
+        <button class="btn-submit" id="submitBtn" onclick="submitQuiz()">Nộp Bài Kết Thúc</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        // Cấu trúc 30 câu: 15 Toán, 10 Tiếng Việt, 5 Logic/Toán Tiếng Anh
+        const quizData = [
+            // TOÁN HỌC (15 câu)
+            { subj: "math", q: "Số thập phân gồm 5 đơn vị, 3 phần trăm được viết là:", options: ["A. 5,3", "B. 5,03", "C. 5,30", "D. 0,53"], ans: 1 },
+            { subj: "math", q: "Tìm 25% của 120:", options: ["A. 30", "B. 40", "C. 25", "D. 120"], ans: 0 },
+            { subj: "math", q: "Diện tích hình tam giác có đáy 10cm, chiều cao 5cm là:", options: ["A. 50 cm2", "B. 25 cm2", "C. 15 cm2", "D. 100 cm2"], ans: 1 },
+            { subj: "math", q: "Một ô tô đi với vận tốc 40 km/giờ. Quãng đường ô tô đi trong 2,5 giờ là:", options: ["A. 100 km", "B. 80 km", "C. 120 km", "D. 60 km"], ans: 0 },
+            { subj: "math", q: "Hình thang có đáy lớn 12cm, đáy bé 8cm, chiều cao 5cm. Diện tích hình thang đó là:", options: ["A. 100 cm2", "B. 50 cm2", "C. 40 cm2", "D. 80 cm2"], ans: 1 },
+            { subj: "math", q: "Phân số 3/4 được viết dưới dạng số thập phân là:", options: ["A. 0,34", "B. 3,4", "C. 0,75", "D. 0,25"], ans: 2 },
+            { subj: "math", q: "1 giờ 15 phút = ... phút. Số thích hợp điền vào chỗ chấm là:", options: ["A. 115", "B. 75", "C. 15", "D. 65"], ans: 1 },
+            { subj: "math", q: "Chu vi hình tròn có bán kính r = 2cm là:", options: ["A. 12,56 cm", "B. 6,28 cm", "C. 3,14 cm", "D. 25,12 cm"], ans: 0 },
+            { subj: "math", q: "Giá trị của biểu thức: 12,5 x 0,1 là:", options: ["A. 125", "B. 1,25", "C. 0,125", "D. 1250"], ans: 1 },
+            { subj: "math", q: "Tìm x biết: x + 2,5 = 5,2. Giá trị của x là:", options: ["A. 2,7", "B. 7,7", "C. 3,3", "D. 2,5"], ans: 0 },
+            { subj: "math", q: "4m 5cm = ... m. Số thập phân thích hợp là:", options: ["A. 4,5", "B. 4,05", "C. 4,50", "D. 4,005"], ans: 1 },
+            { subj: "math", q: "Số lớn nhất trong các số: 3,45; 3,54; 3,05; 3,5 là:", options: ["A. 3,45", "B. 3,54", "C. 3,05", "D. 3,5"], ans: 1 },
+            { subj: "math", q: "Trung bình cộng của 3 số: 4, 5, 6 là:", options: ["A. 4", "B. 5", "C. 6", "D. 15"], ans: 1 },
+            { subj: "math", q: "Mua 5 quyển vở hết 40.000 đồng. Hỏi mua 8 quyển vở như thế hết bao nhiêu tiền?", options: ["A. 60.000 đồng", "B. 64.000 đồng", "C. 50.000 đồng", "D. 72.000 đồng"], ans: 1 },
+            { subj: "math", q: "Tỉ số phần trăm của 3 và 4 là:", options: ["A. 75%", "B. 34%", "C. 43%", "D. 133%"], ans: 0 },
+            
+            // TIẾNG VIỆT (10 câu)
+            { subj: "viet", q: "Từ nào trái nghĩa với từ 'Hòa bình'?", options: ["A. Chiến tranh", "B. Lặng im", "C. Ồn ào", "D. Thái bình"], ans: 0 },
+            { subj: "viet", q: "Cặp quan hệ từ 'Tuy ... nhưng ...' biểu thị quan hệ gì?", options: ["A. Nguyên nhân - Kết quả", "B. Điều kiện - Kết quả", "C. Tương phản", "D. Tăng tiến"], ans: 2 },
+            { subj: "viet", q: "Từ 'chín' trong câu 'Cơm đã chín' và 'Suy nghĩ chín chắn' là hiện tượng gì?", options: ["A. Từ đồng âm", "B. Từ nhiều nghĩa", "C. Từ đồng nghĩa", "D. Từ trái nghĩa"], ans: 1 },
+            { subj: "viet", q: "Câu 'Trời mưa to nên đường phố bị ngập lụt.' là kiểu câu gì?", options: ["A. Câu đơn", "B. Câu ghép", "C. Câu hỏi", "D. Câu cảm"], ans: 1 },
+            { subj: "viet", q: "Xác định chủ ngữ trong câu: 'Dưới bóng tre của ngàn xưa, thấp thoáng mái chùa cổ kính.'", options: ["A. Dưới bóng tre", "B. ngàn xưa", "C. thấp thoáng", "D. mái chùa cổ kính"], ans: 3 },
+            { subj: "viet", q: "Từ nào sau đây viết SAI chính tả?", options: ["A. Xán lạn", "B. Sáng sủa", "C. Xuất sứ", "D. Xinh xắn"], ans: 2 },
+            { subj: "viet", q: "Câu nào dưới đây có sử dụng biện pháp nhân hóa?", options: ["A. Mặt trời đỏ rực như hòn lửa.", "B. Ông mặt trời đang đạp xe qua ngọn núi.", "C. Đêm tối đen như mực.", "D. Nước suối chảy róc rách đêm ngày."], ans: 1 },
+            { subj: "viet", q: "Từ nào đồng nghĩa với từ 'Bao la'?", options: ["A. Chật hẹp", "B. Nhỏ bé", "C. Mênh mông", "D. Cao vút"], ans: 2 },
+            { subj: "viet", q: "Đại từ trong câu 'Hôm nay, tôi đi học sớm.' là từ nào?", options: ["A. Tôi", "B. đi", "C. học", "D. Không có đại từ"], ans: 0 },
+            { subj: "viet", q: "Nhóm từ nào dưới đây toàn là từ láy?", options: ["A. Xanh xanh, học hành", "B. Nho nhỏ, xinh xinh", "C. Mặt mũi, ồn ào", "D. Tươi tốt, lạnh lẽo"], ans: 1 },
+            
+            // LOGIC & TOÁN TIẾNG ANH (5 câu)
+            { subj: "logic", q: "What is the sum of 15 and 20? (Tổng của 15 và 20 là bao nhiêu?)", options: ["A. 5", "B. 35", "C. 300", "D. 1520"], ans: 1 },
+            { subj: "logic", q: "The perimeter of a square with side 5cm is: (Chu vi hình vuông cạnh 5cm là:)", options: ["A. 20 cm", "B. 25 cm", "C. 10 cm", "D. 15 cm"], ans: 0 },
+            { subj: "logic", q: "Nếu hôm nay là Thứ Ba, thì 10 ngày nữa là Thứ mấy?", options: ["A. Thứ Tư", "B. Thứ Năm", "C. Thứ Sáu", "D. Thứ Bảy"], ans: 2 },
+            { subj: "logic", q: "Có 3 con mèo ăn hết 3 con chuột trong 3 phút. Hỏi 100 con mèo ăn hết 100 con chuột trong bao nhiêu phút? (Giả sử tốc độ ăn như nhau)", options: ["A. 100 phút", "B. 3 phút", "C. 1 phút", "D. 300 phút"], ans: 1 },
+            { subj: "logic", q: "Cho dãy số: 1, 3, 6, 10, ... Số tiếp theo điền vào dãy là số mấy?", options: ["A. 12", "B. 14", "C. 15", "D. 16"], ans: 2 }
+        ];
+
+        let timeRemaining = 20 * 60; // 20 phút
+        let timerInterval;
+
+        function getSubjectBadge(subj) {
+            if (subj === 'math') return '<span class="subject-badge bg-math">TOÁN</span>';
+            if (subj === 'viet') return '<span class="subject-badge bg-viet">TIẾNG VIỆT</span>';
+            if (subj === 'logic') return '<span class="subject-badge bg-logic">LOGIC/ENGLISH</span>';
+            return '';
+        }
+
+        function initQuiz() {
+            const container = document.getElementById('quizContainer');
+            quizData.forEach((item, index) => {
+                let optionsHTML = item.options.map((opt, i) => `
+                    <li>
+                        <label id="lbl_q${index}_opt${i}">
+                            <input type="radio" name="q${index}" value="${i}"> ${opt}
+                        </label>
+                    </li>
+                `).join('');
+
+                container.innerHTML += `
+                    <div class="question-card" id="card_q${index}">
+                        <div class="question-title">
+                            ${getSubjectBadge(item.subj)} Câu ${index + 1}: ${item.q}
+                        </div>
+                        <ul class="options">${optionsHTML}</ul>
+                    </div>
+                `;
+            });
+
+            timerInterval = setInterval(updateTimer, 1000);
+            updateTimer();
+        }
+
+        function updateTimer() {
+            let m = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
+            let s = (timeRemaining % 60).toString().padStart(2, '0');
+            document.getElementById('timeDisplay').innerText = `⏱ ${m}:${s}`;
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                submitQuiz();
+            }
+            timeRemaining--;
+        }
+
+        function submitQuiz() {
+            clearInterval(
