@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đấu Trường VioEdu Tiếng Anh - Mô Phỏng Thực Tế</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 850px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: relative; z-index: 10; }
+        h1 { text-align: center; color: #d32f2f; margin-bottom: 5px; font-size: 28px; text-transform: uppercase; }
+        h2 { text-align: center; color: #1976d2; margin-top: 0; margin-bottom: 25px; font-size: 18px; }
+        
+        .header-info { display: flex; justify-content: space-between; align-items: center; background: #e3f2fd; padding: 15px 25px; border-radius: 10px; margin-bottom: 30px; font-weight: bold; font-size: 18px; }
+        .timer { color: #d32f2f; font-size: 24px; display: flex; align-items: center; gap: 8px; }
+        
+        .question-card { background: #fafafa; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid #1976d2; border-bottom: 1px solid #eee; }
+        .question-title { font-size: 17px; font-weight: 600; margin-bottom: 15px; color: #2c3e50; }
+        
+        .btn-listen { background: #ff9800; color: white; border: none; padding: 8px 15px; border-radius: 6px; font-size: 15px; cursor: pointer; font-weight: bold; margin-bottom: 15px; display: inline-flex; align-items: center; gap: 5px; transition: 0.2s; }
+        .btn-listen:hover { background: #f57c00; }
+
+        .options { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .options label { display: flex; align-items: center; padding: 12px; background: #fff; border: 1px solid #cfd8dc; border-radius: 6px; cursor: pointer; transition: 0.2s; font-size: 16px; }
+        .options label:hover { background: #eceff1; border-color: #90a4ae; }
+        input[type="radio"] { margin-right: 12px; transform: scale(1.3); cursor: pointer; }
+        
+        .btn-submit { width: 100%; padding: 15px; font-size: 20px; font-weight: bold; color: white; background-color: #388e3c; border: none; border-radius: 8px; cursor: pointer; margin-top: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-submit:hover { background-color: #2e7d32; }
+        
+        #result { display: none; text-align: center; margin-top: 30px; padding: 25px; border-radius: 8px; font-size: 22px; font-weight: bold; }
+        .canvas-container { margin: 15px 0; text-align: center; }
+        canvas.illustration { background: #fff; border: 1px solid #ccc; border-radius: 5px; }
+        #confettiCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; display: none; }
+        
+        .correct-ans { background: #c8e6c9 !important; border-color: #4caf50 !important; }
+        .wrong-ans { background: #ffcdd2 !important; border-color: #f44336 !important; }
+
+        @media (max-width: 600px) {
+            .options { grid-template-columns: 1fr; }
+            .header-info { flex-direction: column; gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="confettiCanvas"></canvas>
+    <div class="container">
+        <h1>Đề Thi Chính Thức (Mô Phỏng)</h1>
+        <h2>Vòng Khu vực & Thành phố - Tiếng Anh Lớp 1</h2>
+        
+        <div class="header-info">
+            <div>Thí sinh: Duy Thức</div>
+            <div class="timer" id="timeDisplay">⏱ 20:00</div>
+            <div>Số câu: 30</div>
+        </div>
+
+        <div id="quizContainer"></div>
+        <button class="btn-submit" id="submitBtn" onclick="submitQuiz()">Nộp Bài Kết Thúc</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        // 30 Câu hỏi trộn lẫn Từ vựng, Ngữ pháp, Toán và Nghe
+        const quizData = [
+            { q: "Câu 1: What animal is this? (Con chó)", options: ["A. Cat", "B. Dog", "C. Bird", "D. Fish"], ans: 1 },
+            { q: "Câu 2: Choose the odd one out (Chọn từ khác loại):", options: ["A. Red", "B. Blue", "C. Yellow", "D. One"], ans: 3 },
+            { q: "Câu 3: Which word starts with 'E'?", options: ["A. Apple", "B. Elephant", "C. Monkey", "D. Banana"], ans: 1 },
+            { q: "Câu 4: How many eyes do you have? (Bạn có mấy mắt?)", options: ["A. One", "B. Two", "C. Three", "D. Four"], ans: 1 },
+            { q: "Câu 5: The sky is _______.", options: ["A. Red", "B. Green", "C. Blue", "D. Black"], ans: 2 },
+            { q: "Câu 6: What comes after C? (A, B, C, ___ )", options: ["A. D", "B. E", "C. F", "D. G"], ans: 0 },
+            { q: "Câu 7: Who is she? (Mẹ)", options: ["A. Father", "B. Brother", "C. Mother", "D. Grandfather"], ans: 2 },
+            { q: "Câu 8: A cat has _____ legs. (Mèo có mấy chân)", options: ["A. Two", "B. Three", "C. Four", "D. Five"], ans: 2 },
+            { q: "Câu 9: Hello, _____ are you?", options: ["A. what", "B. how", "C. who", "D. is"], ans: 1 },
+            { q: "Câu 10: What _____ your name?", options: ["A. am", "B. are", "C. is", "D. do"], ans: 2 },
+            { q: "Câu 11: Stand _____! (Đứng lên)", options: ["A. down", "B. up", "C. in", "D. on"], ans: 1 },
+            { q: "Câu 12: Is it a pen?", options: ["A. Yes, I am.", "B. Yes, it is.", "C. No, I'm not.", "D. It is red."], ans: 1 },
+            { q: "Câu 13: Nice to _____ you.", options: ["A. meet", "B. see", "C. look", "D. Both A & B are correct"], ans: 0 },
+            { q: "Câu 14: This is my _____ (Cái mũi).", options: ["A. Eye", "B. Ear", "C. Nose", "D. Mouth"], ans: 2 },
+            { q: "Câu 15: I have a _____ (Quyển sách).", options: ["A. Ruler", "B. Book", "C. Eraser", "D. Pencil"], ans: 1 },
+            { q: "Câu 16: 5 + 4 = ?", options: ["A. Seven", "B. Eight", "C. Nine", "D. Ten"], ans: 2 },
+            { q: "Câu 17: 10 - 3 = ?", options: ["A. Six", "B. Seven", "C. Eight", "D. Nine"], ans: 1 },
+            { q: "Câu 18: What shape has 3 sides? (Hình có 3 cạnh)", hasCanvas: "triangle", options: ["A. Circle", "B. Square", "C. Triangle", "D. Rectangle"], ans: 2 },
+            { q: "Câu 19: What shape is round? (Hình tròn)", hasCanvas: "circle", options: ["A. Square", "B. Triangle", "C. Circle", "D. Rectangle"], ans: 2 },
+            { q: "Câu 20: Count: 2, 3, 4, ___, 6", options: ["A. One", "B. Five", "C. Seven", "D. Eight"], ans: 1 },
+            { q: "Câu 21: 6 + 2 = ?", options: ["A. Seven", "B. Eight", "C. Nine", "D. Ten"], ans: 1 },
+            { q: "Câu 22: How many fingers on two hands? (2 bàn tay có bao nhiêu ngón?)", options: ["A. Five", "B. Eight", "C. Nine", "D. Ten"], ans: 3 },
+            { q: "Câu 23 (Nghe): Bấm loa để nghe số.", listenText: "Number eight", options: ["A. 6", "B. 7", "C. 8", "D. 9"], ans: 2 },
+            { q: "Câu 24 (Nghe): Bấm loa để nghe màu sắc.", listenText: "A blue bird", options: ["A. A red bird", "B. A blue bird", "C. A yellow bird", "D. A green bird"], ans: 1 },
+            { q: "Câu 25 (Nghe): Bấm loa để nghe hành động.", listenText: "Touch your nose", options: ["A. Touch your eyes", "B. Touch your mouth", "C. Touch your ears", "D. Touch your nose"], ans: 3 },
+            { q: "Câu 26 (Nghe): Bấm loa để nghe hành động.", listenText: "Open the door", options: ["A. Close the door", "B. Open the door", "C. Open the window", "D. Close the window"], ans: 1 },
+            { q: "Câu 27 (Nghe): Bấm loa để nghe lời chào.", listenText: "Good morning", options: ["A. Good night", "B. Goodbye", "C. Good morning", "D. Good afternoon"], ans: 2 },
+            { q: "Câu 28 (Nghe): Bấm loa để nghe thông tin.", listenText: "I am seven years old", options: ["A. I am 6 years old", "B. I am 7 years old", "C. I am 8 years old", "D. I am 9 years old"], ans: 1 },
+            { q: "Câu 29 (Nghe): Bấm loa để đếm số lượng.", listenText: "Three red apples", options: ["A. 2 red apples", "B. 3 green apples", "C. 3 red apples", "D. 4 red apples"], ans: 2 },
+            { q: "Câu 30 (Nghe): Bấm loa để nghe lời chào tạm biệt.", listenText: "Goodbye", options: ["A. Hello", "B. Thank you", "C. Sorry", "D. Goodbye"], ans: 3 }
+        ];
+
+        let timeRemaining = 20 * 60; // 20 phút
+        let timerInterval;
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            if (type === 'correct') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(300, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.2);
+                gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            }
+        }
+
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.85; 
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("Trình duyệt không hỗ trợ đọc tiếng Anh.");
+            }
+        }
+
+        function initQuiz() {
+            const container = document.getElementById('quizContainer');
+            quizData.forEach((item, index) => {
+                let listenHTML = item.listenText ? `<button class="btn-listen" type="button" onclick="speakText('${item.listenText}')">🔊 Bấm để nghe</button>` : '';
+                let canvasHTML = item.hasCanvas ? `<div class="canvas-container"><canvas id="canvas_q${index}" width="120" height="120" class="illustration"></canvas></div>` : '';
+                
+                let optionsHTML = item.options.map((opt, i) => `
+                    <li>
+                        <label id="lbl_q${index}_opt${i}">
+                            <input type="radio" name="q${index}" value="${i}"> ${opt}
+                        </label>
+                    </li>
+                `).join('');
+
+                container.innerHTML += `
+                    <div class="question-card" id="card_q${index}">
+                        <div class="question-title">${item.q}</div>
+                        ${listenHTML}
+                        ${canvasHTML}
+                        <ul class="options">${optionsHTML}</ul>
+                    </div>
+                `;
+            });
+
+            // Draw canvases
+            quizData.forEach((item, index) => {
+                if(item.hasCanvas) {
+                    const ctx = document.getElementById(`canvas_q${index}`).getContext('2d');
+                    if(item.hasCanvas === 'triangle') {
+                        ctx.fillStyle = '#fbc02d'; ctx.beginPath(); ctx.moveTo(60, 20); ctx.lineTo(100, 100); ctx.lineTo(20, 100); ctx.fill();
+                    } else if(item.hasCanvas === 'circle') {
+                        ctx.fillStyle = '#42a5f5'; ctx.beginPath(); ctx.arc(60, 60, 45, 0, 2*Math.PI); ctx.fill();
+                    }
+                }
+            });
+
+            timerInterval = setInterval(updateTimer, 1000);
+            updateTimer();
+        }
+
+        function updateTimer() {
+            let m = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
+            let s = (timeRemaining % 60).toString().padStart(2, '0');
+            document.getElementById('timeDisplay').innerText = `⏱ ${m}:${s}`;
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                submitQuiz();
+            }
+            timeRemaining--;
+        }
+
+        function submitQuiz() {
+            clearInterval(timerInterval);
+            let score = 0;
+
+            quizData.forEach((item, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                const labels = document.querySelectorAll(`input[name="q${index}"]`);
+                
+                document.getElementById(`lbl_q${index}_opt${item.ans}`).classList.add('correct-ans');
+
+                if (selected) {
+                    if (parseInt(selected.value) === item.ans) {
+                        score += 10; // 10 điểm 1 câu
+                        playSound('correct');
+                    } else {
+                        document.getElementById(`lbl_q${index}_opt${selected.value}`).classList.add('wrong-ans');
+                        playSound('wrong');
+                    }
+                } else {
+                    playSound('wrong');
+                }
+                labels.forEach(r => r.disabled = true);
+            });
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            document.getElementById('submitBtn').style.display = 'none';
+
+            if (score >= 250) {
+                resultDiv.innerHTML = `🏆 Quá xuất sắc! Duy Thức đạt ${score}/300 điểm.`;
+                resultDiv.style.backgroundColor = '#e8f5e9'; resultDiv.style.color = '#2e7d32';
+                startConfetti();
+            } else if (score >= 150) {
+                resultDiv.innerHTML = `👍 Rất tốt! Duy Thức đạt ${score}/300 điểm.`;
+                resultDiv.style.backgroundColor = '#e3f2fd'; resultDiv.style.color = '#1565c0';
+            } else {
+                resultDiv.innerHTML = `💪 Duy Thức đạt ${score}/300 điểm. Con cùng ba xem lại các câu sai để rút kinh nghiệm nhé!`;
+                resultDiv.style.backgroundColor = '#fff3e0'; resultDiv.style.color = '#e65100';
+            }
+            window.scrollTo(0, 0);
+        }
+
+        function startConfetti() {
+            const canvas = document.getElementById('confettiCanvas');
+            canvas.style.display = 'block';
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            const particles = [];
+            for (let i = 0; i < 200; i++) particles.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height - canvas.height, size: Math.random() * 8 + 2, speed: Math.random() * 4 + 2, color: `hsl(${Math.random() * 360}, 100%, 50%)` });
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => { p.y += p.speed; if (p.y > canvas.height) p.y = -10; ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill(); });
+                requestAnimationFrame(animate);
+            }
+            animate();
+            setTimeout(() => { canvas.style.display = 'none'; }, 6000);
+        }
+
+        window.onload = initQuiz;
+    </script>
+</body>
+</html>
