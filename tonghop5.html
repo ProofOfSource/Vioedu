@@ -60,7 +60,6 @@
     </div>
 
     <script>
-        // Cấu trúc 30 câu: 15 Toán, 10 Tiếng Việt, 5 Logic/Toán Tiếng Anh
         const quizData = [
             // TOÁN HỌC (15 câu)
             { subj: "math", q: "Số thập phân gồm 5 đơn vị, 3 phần trăm được viết là:", options: ["A. 5,3", "B. 5,03", "C. 5,30", "D. 0,53"], ans: 1 },
@@ -111,6 +110,8 @@
 
         function initQuiz() {
             const container = document.getElementById('quizContainer');
+            if (!container) return; // Đề phòng lỗi DOM chưa tải
+            
             quizData.forEach((item, index) => {
                 let optionsHTML = item.options.map((opt, i) => `
                     <li>
@@ -146,4 +147,65 @@
         }
 
         function submitQuiz() {
-            clearInterval(
+            clearInterval(timerInterval);
+            let score = 0;
+            let correctCount = 0;
+
+            quizData.forEach((item, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                const labels = document.querySelectorAll(`input[name="q${index}"]`);
+                
+                document.getElementById(`lbl_q${index}_opt${item.ans}`).classList.add('correct-ans');
+
+                if (selected) {
+                    if (parseInt(selected.value) === item.ans) {
+                        score += 10;
+                        correctCount++;
+                    } else {
+                        document.getElementById(`lbl_q${index}_opt${selected.value}`).classList.add('wrong-ans');
+                    }
+                }
+                
+                labels.forEach(r => r.disabled = true);
+            });
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            document.getElementById('submitBtn').style.display = 'none';
+
+            if (score >= 250) {
+                resultDiv.innerHTML = `🏆 XUẤT SẮC!<br>Thí sinh đạt ${score}/300 điểm (${correctCount}/30 câu).`;
+                resultDiv.style.backgroundColor = '#e8f5e9'; resultDiv.style.color = '#2e7d32';
+                startConfetti();
+            } else if (score >= 150) {
+                resultDiv.innerHTML = `👍 RẤT TỐT!<br>Thí sinh đạt ${score}/300 điểm (${correctCount}/30 câu).`;
+                resultDiv.style.backgroundColor = '#e3f2fd'; resultDiv.style.color = '#1565c0';
+            } else {
+                resultDiv.innerHTML = `💪 CỐ GẮNG LÊN!<br>Thí sinh đạt ${score}/300 điểm (${correctCount}/30 câu).<br><span style="font-size: 18px; font-weight: normal;">Hãy ôn tập lại các dạng toán và ngữ pháp Tiếng Việt bị sai nhé.</span>`;
+                resultDiv.style.backgroundColor = '#fff3e0'; resultDiv.style.color = '#e65100';
+            }
+            window.scrollTo(0, 0);
+        }
+
+        function startConfetti() {
+            const canvas = document.getElementById('confettiCanvas');
+            canvas.style.display = 'block';
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            const particles = [];
+            for (let i = 0; i < 200; i++) particles.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height - canvas.height, size: Math.random() * 8 + 2, speed: Math.random() * 4 + 2, color: `hsl(${Math.random() * 360}, 100%, 50%)` });
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => { p.y += p.speed; if (p.y > canvas.height) p.y = -10; ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill(); });
+                requestAnimationFrame(animate);
+            }
+            animate();
+            setTimeout(() => { canvas.style.display = 'none'; }, 6000);
+        }
+
+        // Đã sửa lại phần này để code chạy ngay khi tải trang mà không chờ sự kiện
+        initQuiz();
+
+    </script>
+</body>
+</html>
