@@ -79,9 +79,6 @@
     </div>
 
     <script>
-        // Tạo hàm sinh 30 câu hỏi ngẫu nhiên bám sát thực tế cho mỗi đề để tối ưu mã nguồn
-        // Các câu hỏi được chia làm 4 nhóm: Từ vựng, Ngữ pháp, Toán Tiếng Anh, Nghe hiểu.
-        
         const vocabBank = [
             { q: "What animal is this? (Con chó)", o: ["Cat", "Dog", "Bird", "Fish"], a: 1 },
             { q: "What color is the sky?", o: ["Red", "Green", "Blue", "Yellow"], a: 2 },
@@ -134,7 +131,6 @@
             { q: "(Nghe): Bấm loa nghe lời tạm biệt.", l: "Goodbye", o: ["Hello", "Thank you", "Sorry", "Goodbye"], a: 3 }
         ];
 
-        // Hàm xáo trộn mảng (Fisher-Yates)
         function shuffleArray(array) {
             let arr = [...array];
             for (let i = arr.length - 1; i > 0; i--) {
@@ -144,18 +140,14 @@
             return arr;
         }
 
-        // Tạo 5 bộ đề khác nhau, mỗi đề lấy đủ 30 câu từ các ngân hàng câu hỏi
         const allTests = [];
         for (let i = 6; i <= 10; i++) {
-            // Lấy 8 câu Từ vựng, 8 câu Ngữ pháp, 8 câu Toán, 6 câu Nghe (Tổng 30 câu)
             let testQs = [
                 ...shuffleArray(vocabBank).slice(0, 8),
                 ...shuffleArray(grammarBank).slice(0, 8),
                 ...shuffleArray(mathBank).slice(0, 8),
                 ...shuffleArray(listenBank).slice(0, 6)
             ];
-            
-            // Xáo trộn 30 câu này lên để giống đề thi thật
             testQs = shuffleArray(testQs);
             allTests.push({ title: `ĐỀ THI SỐ ${i} (Vòng Khu Vực - 30 Câu)`, questions: testQs });
         }
@@ -203,15 +195,15 @@
                 window.speechSynthesis.cancel();
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'en-US';
-                utterance.rate = 0.85; // Đọc chậm cho bé lớp 1
+                utterance.rate = 0.85; 
                 window.speechSynthesis.speak(utterance);
             } else {
                 alert("Trình duyệt không hỗ trợ phát âm thanh.");
             }
         }
 
-        function startTest(index) {
-            initAudio(); // Khởi tạo âm thanh ngay khi người dùng click chọn đề
+        window.startTest = function(index) {
+            initAudio(); 
             currentTestIndex = index;
             document.getElementById('menuContainer').style.display = 'none';
             document.getElementById('quizWrapper').style.display = 'block';
@@ -224,11 +216,11 @@
             
             renderQuestions(test.questions);
             
-            timeRemaining = 20 * 60; // Chuẩn 20 phút cho 30 câu
+            timeRemaining = 20 * 60; 
             clearInterval(timerInterval);
             timerInterval = setInterval(updateTimer, 1000);
             updateTimer();
-        }
+        };
 
         function updateTimer() {
             let m = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
@@ -250,4 +242,90 @@
                 
                 let optionsHTML = item.o.map((opt, i) => `
                     <li>
-                        <label id="lbl_q${index}_opt${
+                        <label id="lbl_q${index}_opt${i}">
+                            <input type="radio" name="q${index}" value="${i}"> ${opt}
+                        </label>
+                    </li>
+                `).join('');
+
+                container.innerHTML += `
+                    <div class="question-card" id="card_q${index}">
+                        <div class="question-title">Câu ${index + 1}: ${item.q}</div>
+                        ${listenHTML}
+                        <ul class="options">${optionsHTML}</ul>
+                    </div>
+                `;
+            });
+        }
+
+        window.submitQuiz = function() {
+            clearInterval(timerInterval);
+            const test = allTests[currentTestIndex];
+            let score = 0;
+            let correctCount = 0;
+
+            test.questions.forEach((item, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                const labels = document.querySelectorAll(`input[name="q${index}"]`);
+                
+                document.getElementById(`lbl_q${index}_opt${item.a}`).classList.add('correct-ans');
+
+                if (selected) {
+                    if (parseInt(selected.value) === item.a) {
+                        score += 10; 
+                        correctCount++;
+                        playSound('correct');
+                    } else {
+                        document.getElementById(`lbl_q${index}_opt${selected.value}`).classList.add('wrong-ans');
+                        playSound('wrong');
+                    }
+                } else {
+                    playSound('wrong');
+                }
+                
+                labels.forEach(r => r.disabled = true);
+            });
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            document.getElementById('submitBtn').style.display = 'none';
+            document.getElementById('backBtn').style.display = 'block';
+
+            if (score >= 250) {
+                resultDiv.innerHTML = `🏆 TUYỆT VỜI!<br>Duy Thức đạt ${score}/300 điểm (${correctCount}/30 câu).`;
+                resultDiv.style.backgroundColor = '#e8f5e9'; resultDiv.style.color = '#2e7d32';
+                startConfetti();
+            } else if (score >= 150) {
+                resultDiv.innerHTML = `👍 RẤT TỐT!<br>Duy Thức đạt ${score}/300 điểm (${correctCount}/30 câu).`;
+                resultDiv.style.backgroundColor = '#e3f2fd'; resultDiv.style.color = '#1565c0';
+            } else {
+                resultDiv.innerHTML = `💪 CỐ GẮNG LÊN!<br>Duy Thức đạt ${score}/300 điểm (${correctCount}/30 câu).<br><span style="font-size: 16px; font-weight: normal;">Ba con cùng xem lại những câu bôi đỏ nhé!</span>`;
+                resultDiv.style.backgroundColor = '#fff3e0'; resultDiv.style.color = '#e65100';
+            }
+            window.scrollTo(0, 0);
+        };
+
+        window.backToMenu = function() {
+            document.getElementById('menuContainer').style.display = 'flex';
+            document.getElementById('quizWrapper').style.display = 'none';
+            window.scrollTo(0, 0);
+        };
+
+        function startConfetti() {
+            const canvas = document.getElementById('confettiCanvas');
+            canvas.style.display = 'block';
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            const particles = [];
+            for (let i = 0; i < 200; i++) particles.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height - canvas.height, size: Math.random() * 8 + 2, speed: Math.random() * 4 + 2, color: `hsl(${Math.random() * 360}, 100%, 50%)` });
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => { p.y += p.speed; if (p.y > canvas.height) p.y = -10; ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill(); });
+                requestAnimationFrame(animate);
+            }
+            animate();
+            setTimeout(() => { canvas.style.display = 'none'; }, 6000);
+        }
+    </script>
+</body>
+</html>
