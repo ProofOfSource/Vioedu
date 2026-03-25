@@ -3,113 +3,251 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đấu Trường VioEdu Tiếng Anh - Lớp 1 (Phần 2)</title>
+    <title>Đấu Trường VioEdu Tiếng Anh - Vòng Khu Vực (30 Câu)</title>
     <style>
-        body { font-family: 'Comic Sans MS', 'Segoe UI', sans-serif; background-color: #f3e5f5; color: #333; margin: 0; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); position: relative; z-index: 10; }
-        h1 { text-align: center; color: #9c27b0; font-size: 32px; text-shadow: 1px 1px 2px #ce93d8; }
-        h2 { text-align: center; color: #0288d1; margin-bottom: 20px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 850px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: relative; z-index: 10; }
+        h1 { text-align: center; color: #d32f2f; margin-bottom: 5px; font-size: 28px; text-transform: uppercase; }
+        h2 { text-align: center; color: #1976d2; margin-top: 0; margin-bottom: 25px; font-size: 18px; }
         
-        #menuContainer { display: flex; flex-direction: column; gap: 15px; align-items: center; margin-top: 30px; }
-        .btn-test { width: 80%; padding: 15px; font-size: 20px; font-weight: bold; color: white; background: #ab47bc; border: none; border-radius: 15px; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .btn-test:hover { background: #8e24aa; transform: translateY(-2px); }
-        .btn-test:nth-child(even) { background: #03a9f4; }
-        .btn-test:nth-child(even):hover { background: #0288d1; }
+        #menuContainer { display: flex; flex-direction: column; gap: 12px; align-items: center; margin-top: 20px; }
+        .btn-test { width: 85%; padding: 16px; font-size: 18px; font-weight: bold; color: white; background: #1976d2; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; box-shadow: 0 3px 5px rgba(0,0,0,0.1); }
+        .btn-test:hover { background: #1565c0; transform: translateY(-2px); }
+        .btn-test:nth-child(even) { background: #e65100; }
+        .btn-test:nth-child(even):hover { background: #ef6c00; }
 
         #quizWrapper { display: none; }
-        .timer { font-size: 28px; font-weight: bold; color: #d32f2f; text-align: center; margin-bottom: 20px; padding: 10px 20px; border: 3px dashed #d32f2f; border-radius: 15px; width: fit-content; margin: 0 auto 30px auto; background: #ffebee; }
-        .question-card { background: #fafafa; padding: 20px; border-radius: 15px; margin-bottom: 20px; border-left: 6px solid #ff9800; position: relative; }
-        .question-title { font-size: 18px; font-weight: bold; margin-bottom: 15px; color: #e65100; }
+        .header-info { display: flex; justify-content: space-between; align-items: center; background: #e3f2fd; padding: 15px 25px; border-radius: 10px; margin-bottom: 30px; font-weight: bold; font-size: 18px; }
+        .timer { color: #d32f2f; font-size: 24px; display: flex; align-items: center; gap: 8px; }
         
-        .btn-listen { background: #ec407a; color: white; border: none; padding: 10px 15px; border-radius: 10px; font-size: 16px; cursor: pointer; font-weight: bold; margin-bottom: 15px; display: inline-flex; align-items: center; gap: 5px; }
-        .btn-listen:hover { background: #d81b60; }
+        .question-card { background: #fafafa; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid #1976d2; border-bottom: 1px solid #eee; }
+        .question-title { font-size: 17px; font-weight: 600; margin-bottom: 15px; color: #2c3e50; }
+        
+        .btn-listen { background: #ff9800; color: white; border: none; padding: 8px 15px; border-radius: 6px; font-size: 15px; cursor: pointer; font-weight: bold; margin-bottom: 15px; display: inline-flex; align-items: center; gap: 5px; transition: 0.2s; }
+        .btn-listen:hover { background: #f57c00; }
 
-        .options { list-style: none; padding: 0; margin: 0; }
-        .options li { margin-bottom: 10px; }
-        .options label { display: flex; align-items: center; padding: 12px; background: #fff; border: 2px solid #e0e0e0; border-radius: 10px; cursor: pointer; transition: 0.2s; font-size: 18px; font-weight: bold; }
-        .options label:hover { background: #fff3e0; border-color: #ff9800; }
-        input[type="radio"] { margin-right: 15px; transform: scale(1.5); cursor: pointer; }
+        .options { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .options label { display: flex; align-items: center; padding: 12px; background: #fff; border: 1px solid #cfd8dc; border-radius: 6px; cursor: pointer; transition: 0.2s; font-size: 16px; }
+        .options label:hover { background: #eceff1; border-color: #90a4ae; }
+        input[type="radio"] { margin-right: 12px; transform: scale(1.3); cursor: pointer; }
         
-        .btn-submit { width: 100%; padding: 15px; font-size: 22px; font-weight: bold; color: white; background-color: #4caf50; border: none; border-radius: 15px; cursor: pointer; margin-top: 20px; }
-        .btn-submit:hover { background-color: #388e3c; }
-        .btn-back { width: 100%; padding: 15px; font-size: 20px; font-weight: bold; color: white; background-color: #9e9e9e; border: none; border-radius: 15px; cursor: pointer; margin-top: 10px; }
+        .btn-submit { width: 100%; padding: 15px; font-size: 20px; font-weight: bold; color: white; background-color: #388e3c; border: none; border-radius: 8px; cursor: pointer; margin-top: 20px; text-transform: uppercase; }
+        .btn-submit:hover { background-color: #2e7d32; }
+        .btn-back { width: 100%; padding: 15px; font-size: 18px; font-weight: bold; color: white; background-color: #757575; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px; }
         
-        #result { display: none; text-align: center; margin-top: 30px; padding: 20px; border-radius: 15px; font-size: 24px; font-weight: bold; }
+        #result { display: none; text-align: center; margin-top: 30px; padding: 25px; border-radius: 8px; font-size: 22px; font-weight: bold; line-height: 1.5; }
         #confettiCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; display: none; }
         
         .correct-ans { background: #c8e6c9 !important; border-color: #4caf50 !important; }
         .wrong-ans { background: #ffcdd2 !important; border-color: #f44336 !important; }
+
+        @media (max-width: 600px) {
+            .options { grid-template-columns: 1fr; }
+            .header-info { flex-direction: column; gap: 10px; }
+        }
     </style>
 </head>
 <body>
     <canvas id="confettiCanvas"></canvas>
     <div class="container">
-        <h1>VioEdu Tiếng Anh - Lớp 1</h1>
-        <h2>Thí sinh: Duy Thức (Phần 2)</h2>
+        <h1>VioEdu Tiếng Anh - Vòng Khu Vực</h1>
+        <h2>Thí sinh: Duy Thức | Thời gian: 20 phút - 30 câu</h2>
 
         <div id="menuContainer">
-            <h3 style="color: #455a64;">Giai đoạn 2: Tiến tới vòng Thành phố!</h3>
-            <button class="btn-test" onclick="startTest(0)">📝 Đề 6: Khám phá</button>
-            <button class="btn-test" onclick="startTest(1)">📝 Đề 7: Thử thách</button>
-            <button class="btn-test" onclick="startTest(2)">📝 Đề 8: Bứt phá</button>
-            <button class="btn-test" onclick="startTest(3)">📝 Đề 9: Chinh phục</button>
-            <button class="btn-test" onclick="startTest(4)">🏆 Đề 10: Vô địch</button>
+            <h3 style="color: #455a64; margin-bottom: 20px;">Chọn đề thi để bắt đầu tính giờ:</h3>
+            <button class="btn-test" onclick="startTest(0)">📝 ĐỀ THI SỐ 6 (Chuẩn 30 Câu)</button>
+            <button class="btn-test" onclick="startTest(1)">📝 ĐỀ THI SỐ 7 (Chuẩn 30 Câu)</button>
+            <button class="btn-test" onclick="startTest(2)">📝 ĐỀ THI SỐ 8 (Chuẩn 30 Câu)</button>
+            <button class="btn-test" onclick="startTest(3)">📝 ĐỀ THI SỐ 9 (Chuẩn 30 Câu)</button>
+            <button class="btn-test" onclick="startTest(4)">🏆 ĐỀ THI SỐ 10 (Chuẩn 30 Câu)</button>
         </div>
 
         <div id="quizWrapper">
-            <h3 id="testTitle" style="text-align: center; color: #ff5722;"></h3>
-            <div class="timer" id="timeDisplay">15:00</div>
+            <h3 id="testTitle" style="text-align: center; color: #d32f2f;"></h3>
+            <div class="header-info">
+                <div>Thí sinh: Duy Thức</div>
+                <div class="timer" id="timeDisplay">⏱ 20:00</div>
+                <div>Tổng: 300 điểm</div>
+            </div>
+            
             <div id="quizContainer"></div>
-            <button class="btn-submit" id="submitBtn" onclick="submitQuiz()">Nộp Bài</button>
-            <button class="btn-back" id="backBtn" onclick="backToMenu()" style="display:none;">Quay lại Menu</button>
+            
+            <button class="btn-submit" id="submitBtn" onclick="submitQuiz()">Nộp Bài Kết Thúc</button>
+            <button class="btn-back" id="backBtn" onclick="backToMenu()" style="display:none;">Quay lại Menu Chính</button>
             <div id="result"></div>
         </div>
     </div>
 
     <script>
-        const allTests = [
-            // ĐỀ 6
-            {
-                title: "Đề 6: Khám phá",
-                questions: [
-                    { q: "Câu 1: What color is the leaf? (Chiếc lá màu gì?)", options: ["A. Red", "B. Blue", "C. Green", "D. Yellow"], ans: 2 },
-                    { q: "Câu 2: Which animal says 'Meow'?", options: ["A. Dog", "B. Cat", "C. Duck", "D. Bird"], ans: 1 },
-                    { q: "Câu 3: 4 + 5 = ?", options: ["A. Eight", "B. Nine", "C. Ten", "D. Seven"], ans: 1 },
-                    { q: "Câu 4: What letter comes before 'D'? (A, B, _, D)", options: ["A. C", "B. E", "C. F", "D. G"], ans: 0 },
-                    { q: "Câu 5: I have _____ fingers on one hand. (Một bàn tay có mấy ngón?)", options: ["A. Four", "B. Five", "C. Six", "D. Ten"], ans: 1 },
-                    { q: "Câu 6: Is it a dog?", options: ["A. Yes, it is.", "B. Yes, I am.", "C. No, it is.", "D. It is red."], ans: 0 },
-                    { q: "Câu 7 (Nghe): Bấm loa để nghe hành động.", listenText: "Touch your head", options: ["A. Touch your nose", "B. Touch your eyes", "C. Touch your head", "D. Touch your ears"], ans: 2 },
-                    { q: "Câu 8 (Nghe): Bấm loa để nghe số.", listenText: "Number ten", options: ["A. 7", "B. 8", "C. 9", "D. 10"], ans: 3 },
-                    { q: "Câu 9 (Nghe): Bấm loa để nghe màu sắc đồ vật.", listenText: "A yellow star", options: ["A. A red star", "B. A yellow star", "C. A blue star", "D. A green star"], ans: 1 },
-                    { q: "Câu 10 (Nghe): Bấm loa để nghe đồ vật.", listenText: "Three red cars", options: ["A. 2 red cars", "B. 3 blue cars", "C. 3 red cars", "D. 4 red cars"], ans: 2 }
-                ]
-            },
-            // ĐỀ 7
-            {
-                title: "Đề 7: Thử thách",
-                questions: [
-                    { q: "Câu 1: Who is he? (Bố)", options: ["A. Mother", "B. Sister", "C. Father", "D. Grandmother"], ans: 2 },
-                    { q: "Câu 2: 10 - 6 = ?", options: ["A. Three", "B. Four", "C. Five", "D. Six"], ans: 1 },
-                    { q: "Câu 3: Which word starts with 'H'?", options: ["A. Apple", "B. Hat", "C. Cat", "D. Dog"], ans: 1 },
-                    { q: "Câu 4: What shape has NO sides? (Hình không có cạnh)", options: ["A. Triangle", "B. Square", "C. Circle", "D. Rectangle"], ans: 2 },
-                    { q: "Câu 5: It is a _____ (Cây bút chì).", options: ["A. Pen", "B. Eraser", "C. Ruler", "D. Pencil"], ans: 3 },
-                    { q: "Câu 6: How many legs does a dog have?", options: ["A. Two", "B. Three", "C. Four", "D. Five"], ans: 2 },
-                    { q: "Câu 7 (Nghe): Bấm loa để nghe hành động.", listenText: "Clap your hands", options: ["A. Stamp your feet", "B. Clap your hands", "C. Stand up", "D. Sit down"], ans: 1 },
-                    { q: "Câu 8 (Nghe): Bấm loa để nghe con vật.", listenText: "A green frog", options: ["A. A red frog", "B. A green frog", "C. A blue bird", "D. A green snake"], ans: 1 },
-                    { q: "Câu 9 (Nghe): Bấm loa để đếm.", listenText: "Seven apples", options: ["A. 6 apples", "B. 7 apples", "C. 8 apples", "D. 9 apples"], ans: 1 },
-                    { q: "Câu 10 (Nghe): Bấm loa để nghe lời chào.", listenText: "Good afternoon", options: ["A. Good morning", "B. Good afternoon", "C. Good evening", "D. Good night"], ans: 1 }
-                ]
-            },
-            // ĐỀ 8
-            {
-                title: "Đề 8: Bứt phá",
-                questions: [
-                    { q: "Câu 1: 2 + ? = 8", options: ["A. Four", "B. Five", "C. Six", "D. Seven"], ans: 2 },
-                    { q: "Câu 2: The sun is _____ (Mặt trời màu gì?).", options: ["A. Yellow", "B. Green", "C. Blue", "D. Red"], ans: 0 },
-                    { q: "Câu 3: What is missing: 1, 3, 5, _, 9", options: ["A. 4", "B. 6", "C. 7", "D. 8"], ans: 2 },
-                    { q: "Câu 4: Point to your _____ (Đôi mắt).", options: ["A. Nose", "B. Mouth", "C. Ears", "D. Eyes"], ans: 3 },
-                    { q: "Câu 5: A bird can _____ (Chim có thể làm gì?).", options: ["A. Swim", "B. Fly", "C. Read", "D. Write"], ans: 1 },
-                    { q: "Câu 6: Odd one out (Chọn từ khác loại):", options: ["A. Dog", "B. Cat", "C. Red", "D. Pig"], ans: 2 },
-                    { q: "Câu 7 (Nghe): Bấm loa để nghe yêu cầu.", listenText: "Stand up, please", options: ["A. Sit down, please", "B. Stand up, please", "C. Open the book", "D. Close the door"], ans: 1 },
-                    { q: "Câu 8 (Nghe): Bấm loa để nghe số lượng.", listenText: "Eight cats", options: ["A. 7 cats", "B. 8 cats", "C. 9 cats", "D. 10 cats"], ans: 1 },
-                    { q: "Câu 9 (Nghe): Bấm loa để nghe hành động.", listenText: "Open the window", options: ["A. Open the door", "B. Close the door", "
+        // Tạo hàm sinh 30 câu hỏi ngẫu nhiên bám sát thực tế cho mỗi đề để tối ưu mã nguồn
+        // Các câu hỏi được chia làm 4 nhóm: Từ vựng, Ngữ pháp, Toán Tiếng Anh, Nghe hiểu.
+        
+        const vocabBank = [
+            { q: "What animal is this? (Con chó)", o: ["Cat", "Dog", "Bird", "Fish"], a: 1 },
+            { q: "What color is the sky?", o: ["Red", "Green", "Blue", "Yellow"], a: 2 },
+            { q: "Which word starts with 'A'?", o: ["Apple", "Banana", "Cat", "Dog"], a: 0 },
+            { q: "Who is she? (Mẹ)", o: ["Father", "Brother", "Mother", "Grandfather"], a: 2 },
+            { q: "This is a _____ (Cây bút chì).", o: ["Pen", "Ruler", "Book", "Pencil"], a: 3 },
+            { q: "Point to your _____ (Cái mũi).", o: ["Eye", "Ear", "Nose", "Mouth"], a: 2 },
+            { q: "Choose the odd one out:", o: ["Red", "Blue", "Green", "Dog"], a: 3 },
+            { q: "What is missing: A, B, C, _, E", o: ["D", "F", "G", "H"], a: 0 },
+            { q: "I have two _____ (Mắt).", o: ["Nose", "Mouth", "Eyes", "Ears"], a: 2 },
+            { q: "A cat has _____ legs.", o: ["Two", "Three", "Four", "Five"], a: 2 }
+        ];
+
+        const grammarBank = [
+            { q: "Hello, _____ are you?", o: ["what", "how", "who", "is"], a: 1 },
+            { q: "What _____ your name?", o: ["am", "are", "is", "do"], a: 2 },
+            { q: "Is it a pen?", o: ["Yes, I am.", "Yes, it is.", "No, I'm not.", "It is red."], a: 1 },
+            { q: "Stand _____! (Đứng lên)", o: ["down", "up", "in", "on"], a: 1 },
+            { q: "Sit _____! (Ngồi xuống)", o: ["down", "up", "in", "on"], a: 0 },
+            { q: "I _____ seven years old.", o: ["is", "am", "are", "do"], a: 1 },
+            { q: "How many dogs _____ there?", o: ["is", "am", "are", "do"], a: 2 },
+            { q: "Nice to _____ you.", o: ["meet", "look", "listen", "stand"], a: 0 },
+            { q: "It _____ a blue book.", o: ["is", "am", "are", "do"], a: 0 },
+            { q: "Good _____, teacher! (Chào buổi sáng)", o: ["night", "bye", "morning", "afternoon"], a: 2 }
+        ];
+
+        const mathBank = [
+            { q: "3 + 4 = ?", o: ["Six", "Seven", "Eight", "Nine"], a: 1 },
+            { q: "10 - 2 = ?", o: ["Seven", "Eight", "Nine", "Ten"], a: 1 },
+            { q: "5 + 5 = ?", o: ["Eight", "Nine", "Ten", "Eleven"], a: 2 },
+            { q: "9 - 4 = ?", o: ["Four", "Five", "Six", "Seven"], a: 1 },
+            { q: "Count: 1, 2, 3, _, 5", o: ["Four", "Six", "Two", "Seven"], a: 0 },
+            { q: "Count backwards: 5, 4, 3, _", o: ["1", "2", "6", "7"], a: 1 },
+            { q: "What shape has 3 sides? (Hình có 3 cạnh)", o: ["Circle", "Square", "Triangle", "Rectangle"], a: 2 },
+            { q: "What shape is round? (Hình tròn)", o: ["Square", "Triangle", "Circle", "Rectangle"], a: 2 },
+            { q: "How many fingers on one hand?", o: ["Four", "Five", "Six", "Ten"], a: 1 },
+            { q: "Look at the pattern: Red, Blue, Red, Blue, _?", o: ["Green", "Blue", "Red", "Yellow"], a: 2 }
+        ];
+
+        const listenBank = [
+            { q: "(Nghe): Bấm loa để nghe số.", l: "Number eight", o: ["6", "7", "8", "9"], a: 2 },
+            { q: "(Nghe): Bấm loa để nghe màu.", l: "A blue bird", o: ["A red bird", "A blue bird", "A yellow bird", "A green bird"], a: 1 },
+            { q: "(Nghe): Bấm loa để nghe hành động.", l: "Touch your nose", o: ["Touch eyes", "Touch mouth", "Touch ears", "Touch nose"], a: 3 },
+            { q: "(Nghe): Bấm loa để nghe hành động.", l: "Open the door", o: ["Close door", "Open door", "Open window", "Close window"], a: 1 },
+            { q: "(Nghe): Bấm loa để nghe lời chào.", l: "Good morning", o: ["Good night", "Goodbye", "Good morning", "Good afternoon"], a: 2 },
+            { q: "(Nghe): Bấm loa để đếm.", l: "Three red apples", o: ["2 red apples", "3 green apples", "3 red apples", "4 red apples"], a: 2 },
+            { q: "(Nghe): Bấm loa để nghe con vật.", l: "A pink pig", o: ["A pink pig", "A red cow", "A pink sheep", "A black horse"], a: 0 },
+            { q: "(Nghe): Bấm loa để nghe câu hỏi.", l: "How are you?", o: ["How old are you?", "What is your name?", "How are you?", "Who are you?"], a: 2 },
+            { q: "(Nghe): Bấm loa để đếm mèo.", l: "Nine cats", o: ["7", "8", "9", "10"], a: 2 },
+            { q: "(Nghe): Bấm loa nghe lời tạm biệt.", l: "Goodbye", o: ["Hello", "Thank you", "Sorry", "Goodbye"], a: 3 }
+        ];
+
+        // Hàm xáo trộn mảng (Fisher-Yates)
+        function shuffleArray(array) {
+            let arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // Tạo 5 bộ đề khác nhau, mỗi đề lấy đủ 30 câu từ các ngân hàng câu hỏi
+        const allTests = [];
+        for (let i = 6; i <= 10; i++) {
+            // Lấy 8 câu Từ vựng, 8 câu Ngữ pháp, 8 câu Toán, 6 câu Nghe (Tổng 30 câu)
+            let testQs = [
+                ...shuffleArray(vocabBank).slice(0, 8),
+                ...shuffleArray(grammarBank).slice(0, 8),
+                ...shuffleArray(mathBank).slice(0, 8),
+                ...shuffleArray(listenBank).slice(0, 6)
+            ];
+            
+            // Xáo trộn 30 câu này lên để giống đề thi thật
+            testQs = shuffleArray(testQs);
+            allTests.push({ title: `ĐỀ THI SỐ ${i} (Vòng Khu Vực - 30 Câu)`, questions: testQs });
+        }
+
+        let currentTestIndex = 0;
+        let timerInterval;
+        let timeRemaining;
+        let audioCtx = null;
+        
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(type) {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.2);
+                gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            }
+        }
+
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.85; // Đọc chậm cho bé lớp 1
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("Trình duyệt không hỗ trợ phát âm thanh.");
+            }
+        }
+
+        function startTest(index) {
+            initAudio(); // Khởi tạo âm thanh ngay khi người dùng click chọn đề
+            currentTestIndex = index;
+            document.getElementById('menuContainer').style.display = 'none';
+            document.getElementById('quizWrapper').style.display = 'block';
+            document.getElementById('submitBtn').style.display = 'block';
+            document.getElementById('backBtn').style.display = 'none';
+            document.getElementById('result').style.display = 'none';
+            
+            const test = allTests[index];
+            document.getElementById('testTitle').innerText = test.title;
+            
+            renderQuestions(test.questions);
+            
+            timeRemaining = 20 * 60; // Chuẩn 20 phút cho 30 câu
+            clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+            updateTimer();
+        }
+
+        function updateTimer() {
+            let m = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
+            let s = (timeRemaining % 60).toString().padStart(2, '0');
+            document.getElementById('timeDisplay').innerText = `⏱ ${m}:${s}`;
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                submitQuiz();
+            }
+            timeRemaining--;
+        }
+
+        function renderQuestions(questions) {
+            const container = document.getElementById('quizContainer');
+            container.innerHTML = '';
+            
+            questions.forEach((item, index) => {
+                let listenHTML = item.l ? `<button class="btn-listen" type="button" onclick="speakText('${item.l}')">🔊 Bấm để nghe</button>` : '';
+                
+                let optionsHTML = item.o.map((opt, i) => `
+                    <li>
+                        <label id="lbl_q${index}_opt${
