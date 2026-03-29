@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VioEdu Tiếng Anh Lớp 1 - Vòng Quốc Gia (Không lặp câu hỏi)</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1a237e; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 850px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); position: relative; z-index: 10; }
+        h1 { text-align: center; color: #b71c1c; margin-bottom: 5px; font-size: 32px; text-transform: uppercase; text-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #283593; margin-top: 0; margin-bottom: 25px; font-size: 18px; font-weight: 600; }
+        
+        #menuContainer { display: flex; flex-direction: column; gap: 14px; align-items: center; margin-top: 20px; }
+        .btn-test { width: 85%; padding: 18px; font-size: 19px; font-weight: bold; color: white; background: #c62828; border: none; border-radius: 12px; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 8px rgba(0,0,0,0.2); text-transform: uppercase; }
+        .btn-test:hover { background: #b71c1c; transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.3); }
+        .btn-test:nth-child(even) { background: #1565c0; }
+        .btn-test:nth-child(even):hover { background: #0d47a1; }
+
+        #quizWrapper { display: none; }
+        .header-info { display: flex; justify-content: space-between; align-items: center; background: #e8eaf6; padding: 15px 25px; border-radius: 10px; margin-bottom: 30px; font-weight: bold; font-size: 18px; border-left: 6px solid #3f51b5; }
+        .timer { color: #d32f2f; font-size: 28px; display: flex; align-items: center; gap: 8px; font-family: monospace; }
+        
+        .question-card { background: #f5f5f5; padding: 22px; border-radius: 12px; margin-bottom: 22px; border: 2px solid #e0e0e0; transition: 0.3s; }
+        .question-card:hover { border-color: #3f51b5; box-shadow: 0 5px 15px rgba(63,81,181,0.15); }
+        .question-title { font-size: 19px; font-weight: 700; margin-bottom: 18px; color: #1a237e; line-height: 1.4; }
+        
+        .btn-listen { background: #8e24aa; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: bold; margin-bottom: 15px; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-listen:hover { background: #6a1b9a; }
+
+        .options { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .options label { display: flex; align-items: center; padding: 15px; background: #fff; border: 2px solid #cfd8dc; border-radius: 8px; cursor: pointer; transition: 0.2s; font-size: 18px; font-weight: 600; color: #455a64; }
+        .options label:hover { background: #e8eaf6; border-color: #3f51b5; color: #1a237e; }
+        input[type="radio"] { margin-right: 15px; transform: scale(1.5); cursor: pointer; accent-color: #3f51b5; }
+        
+        .btn-submit { width: 100%; padding: 18px; font-size: 24px; font-weight: bold; color: white; background-color: #2e7d32; border: none; border-radius: 12px; cursor: pointer; margin-top: 25px; text-transform: uppercase; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        .btn-submit:hover { background-color: #1b5e20; }
+        .btn-back { width: 100%; padding: 16px; font-size: 18px; font-weight: bold; color: white; background-color: #546e7a; border: none; border-radius: 12px; cursor: pointer; margin-top: 15px; }
+        
+        #result { display: none; text-align: center; margin-top: 30px; padding: 25px; border-radius: 12px; font-size: 24px; font-weight: bold; line-height: 1.6; }
+        #confettiCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; display: none; }
+        
+        .correct-ans { background: #c8e6c9 !important; border-color: #4caf50 !important; color: #1b5e20 !important; }
+        .wrong-ans { background: #ffcdd2 !important; border-color: #f44336 !important; color: #b71c1c !important; text-decoration: line-through; }
+
+        @media (max-width: 600px) {
+            .options { grid-template-columns: 1fr; }
+            .header-info { flex-direction: column; gap: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="confettiCanvas"></canvas>
+    <div class="container">
+        <h1>VÒNG QUỐC GIA - ĐỀ ĐỘC LẬP</h1>
+        <h2>Thí sinh: Duy Thức | 150 Câu Hỏi Không Trùng Lặp</h2>
+
+        <div id="menuContainer">
+            <h3 style="color: #c62828; margin-bottom: 20px;">Chọn đề thi để bắt đầu:</h3>
+            <button class="btn-test" onclick="startTest(16)">🔥 ĐỀ 16: Chủ đề Động vật, Màu sắc, Phép cộng</button>
+            <button class="btn-test" onclick="startTest(17)">🔥 ĐỀ 17: Chủ đề Đồ ăn, Hình học, Giới từ</button>
+            <button class="btn-test" onclick="startTest(18)">🔥 ĐỀ 18: Chủ đề Cơ thể, Toán đố, Trang phục</button>
+            <button class="btn-test" onclick="startTest(19)">🔥 ĐỀ 19: Phương tiện, Thời tiết, Đại từ</button>
+            <button class="btn-test" onclick="startTest(20)">🏆 ĐỀ 20: Tổng hợp IQ, Nghề nghiệp, Không gian</button>
+        </div>
+
+        <div id="quizWrapper">
+            <h3 id="testTitle" style="text-align: center; color: #c62828;"></h3>
+            <div class="header-info">
+                <div>Độ khó: Tuyệt đối</div>
+                <div class="timer" id="timeDisplay">⏱ 20:00</div>
+                <div>Điểm tối đa: 300</div>
+            </div>
+            <div id="quizContainer"></div>
+            <button class="btn-submit" id="submitBtn" onclick="submitQuiz()">Nộp Bài Hoàn Thành</button>
+            <button class="btn-back" id="backBtn" onclick="backToMenu()" style="display:none;">Quay Lại Bảng Chọn Đề</button>
+            <div id="result"></div>
+        </div>
+    </div>
+
+    <script>
+        // BỘ DỮ LIỆU ĐỘC QUYỀN 150 CÂU (KHÔNG LẶP LẠI)
+        const allTests = {
+            16: {
+                title: "ĐỀ THI SỐ 16 (Động vật, Màu sắc, Toán 50)",
+                questions: [
+                    { q: "What animal has a very long trunk? (Con gì có cái vòi dài?)", o: ["Monkey", "Elephant", "Tiger", "Bear"], a: 1 },
+                    { q: "The king of the jungle is the _____. (Vua rừng xanh)", o: ["Lion", "Cat", "Dog", "Rabbit"], a: 0 },
+                    { q: "Which animal can hop and has long ears?", o: ["Fish", "Duck", "Kangaroo", "Rabbit"], a: 3 },
+                    { q: "What color is a carrot?", o: ["Red", "Orange", "Yellow", "Green"], a: 1 },
+                    { q: "Apples are usually _____ or green.", o: ["Red", "Blue", "Black", "Purple"], a: 0 },
+                    { q: "The sky is _____.", o: ["White", "Blue", "Pink", "Brown"], a: 1 },
+                    { q: "Who is your mother's sister? (Chị/em gái của mẹ)", o: ["Aunt", "Uncle", "Grandma", "Cousin"], a: 0 },
+                    { q: "This _____ my family.", o: ["am", "is", "are", "do"], a: 1 },
+                    { q: "I _____ a big dog.", o: ["has", "have", "is", "am"], a: 1 },
+                    { q: "_____ many brothers do you have?", o: ["What", "Who", "How", "Where"], a: 2 },
+                    { q: "12 + 15 = ?", o: ["25", "26", "27", "28"], a: 2 },
+                    { q: "30 + 20 = ?", o: ["40", "50", "60", "70"], a: 1 },
+                    { q: "24 + 11 = ?", o: ["33", "34", "35", "36"], a: 2 },
+                    { q: "There are 10 birds. 5 more join them. How many birds now?", o: ["10", "15", "20", "5"], a: 1 },
+                    { q: "I have 12 pens. My dad gives me 8 pens. Total pens?", o: ["18", "19", "20", "21"], a: 2 },
+                    { q: "What number comes after 39?", o: ["38", "40", "41", "30"], a: 1 },
+                    { q: "Which number is the biggest? (Số nào lớn nhất?)", o: ["19", "29", "45", "38"], a: 2 },
+                    { q: "10 + 10 + 10 = ?", o: ["20", "30", "40", "50"], a: 1 },
+                    { q: "A dog has 4 legs. How many legs do 3 dogs have?", o: ["8", "10", "12", "14"], a: 2 },
+                    { q: "Find the missing number: 2, 4, 6, 8, _", o: ["9", "10", "11", "12"], a: 1 },
+                    { q: "Half of 20 is... (Một nửa của 20 là)", o: ["5", "10", "15", "20"], a: 1 },
+                    { q: "15 is bigger than... (15 lớn hơn số nào?)", o: ["16", "20", "14", "18"], a: 2 },
+                    { q: "Count backwards: 10, 9, 8, 7, _", o: ["5", "6", "4", "3"], a: 1 },
+                    { q: "11 + 11 = ?", o: ["20", "21", "22", "23"], a: 2 },
+                    { q: "(Nghe) Con gì đây?", l: "It is a big grey elephant.", o: ["Khỉ", "Sư tử", "Voi", "Hổ"], a: 2 },
+                    { q: "(Nghe) Màu sắc là gì?", l: "My favorite color is orange.", o: ["Đỏ", "Cam", "Vàng", "Xanh"], a: 1 },
+                    { q: "(Nghe) Phép tính:", l: "Twenty plus ten equals thirty.", o: ["20+10=30", "10+10=20", "30+10=40", "20+20=40"], a: 0 },
+                    { q: "(Nghe) Mấy người trong gia đình?", l: "There are four people in my family.", o: ["3", "4", "5", "6"], a: 1 },
+                    { q: "(Nghe) Bạn này tên gì?", l: "His name is Peter.", o: ["Mary", "John", "Peter", "Tom"], a: 2 },
+                    { q: "(Nghe) Có bao nhiêu cuốn sách?", l: "I have seventeen books.", o: ["16", "17", "18", "19"], a: 1 }
+                ]
+            },
+            17: {
+                title: "ĐỀ THI SỐ 17 (Đồ ăn, Hình học, Giới từ)",
+                questions: [
+                    { q: "What do you drink in the morning? (Thức uống buổi sáng)", o: ["Bread", "Milk", "Chicken", "Rice"], a: 1 },
+                    { q: "Which one is a fruit? (Đâu là trái cây?)", o: ["Carrot", "Potato", "Tomato", "Banana"], a: 3 },
+                    { q: "We eat _____ for dinner.", o: ["Water", "Juice", "Rice", "Tea"], a: 2 },
+                    { q: "Where do you read books? (Đọc sách ở đâu?)", o: ["Library", "Kitchen", "Bathroom", "Hospital"], a: 0 },
+                    { q: "You write with a _____.", o: ["Eraser", "Pencil", "Ruler", "Bag"], a: 1 },
+                    { q: "A shape with 3 sides is a _____.", o: ["Square", "Circle", "Triangle", "Star"], a: 2 },
+                    { q: "A shape with NO sides is a _____.", o: ["Circle", "Rectangle", "Square", "Triangle"], a: 0 },
+                    { q: "The cat is _____ the box. (Bên trong)", o: ["on", "in", "under", "next to"], a: 1 },
+                    { q: "The bird is flying _____ the tree. (Bên trên/Ở trên)", o: ["under", "in", "on", "behind"], a: 2 },
+                    { q: "_____ your hands, please! (Vỗ tay)", o: ["Stamp", "Clap", "Stand", "Sit"], a: 1 },
+                    { q: "16 - 4 = ?", o: ["10", "11", "12", "13"], a: 2 },
+                    { q: "25 - 5 = ?", o: ["15", "20", "25", "30"], a: 1 },
+                    { q: "40 - 10 = ?", o: ["20", "30", "40", "50"], a: 1 },
+                    { q: "I have 15 apples. I eat 3. How many left?", o: ["10", "11", "12", "13"], a: 2 },
+                    { q: "Tom has 20 toys. He gives 5 to Anna. How many left?", o: ["10", "15", "20", "25"], a: 1 },
+                    { q: "How many corners does a square have? (Hình vuông có mấy góc?)", o: ["2", "3", "4", "5"], a: 2 },
+                    { q: "Look at the pattern: Circle, Square, Circle, Square, _ ?", o: ["Triangle", "Square", "Circle", "Star"], a: 2 },
+                    { q: "What number comes before 50?", o: ["48", "49", "51", "52"], a: 1 },
+                    { q: "13 + 7 = ?", o: ["18", "19", "20", "21"], a: 2 },
+                    { q: "22 - 11 = ?", o: ["10", "11", "12", "13"], a: 1 },
+                    { q: "Which is smaller: 45 or 54?", o: ["45", "54", "They are equal", "0"], a: 0 },
+                    { q: "10 + 5 + 2 = ?", o: ["15", "16", "17", "18"], a: 2 },
+                    { q: "You put your books in a _____.", o: ["Hat", "Shoe", "Schoolbag", "Sock"], a: 2 },
+                    { q: "What color is milk?", o: ["Black", "White", "Red", "Blue"], a: 1 },
+                    { q: "(Nghe) Món ăn là gì?", l: "I like eating pizza.", o: ["Gà rán", "Bánh mì", "Pizza", "Cơm"], a: 2 },
+                    { q: "(Nghe) Hình gì đây?", l: "It is a green triangle.", o: ["Tròn xanh", "Tam giác xanh", "Vuông đỏ", "Tam giác đỏ"], a: 1 },
+                    { q: "(Nghe) Vật ở đâu?", l: "The ruler is under the book.", o: ["Trên sách", "Trong cặp", "Dưới sách", "Cạnh bút"], a: 2 },
+                    { q: "(Nghe) Phép tính:", l: "Nineteen minus nine equals ten.", o: ["19-9=10", "19-10=9", "90-9=81", "10-9=1"], a: 0 },
+                    { q: "(Nghe) Đồ vật trường học:", l: "This is my yellow pencil case.", o: ["Hộp bút vàng", "Bút chì vàng", "Cục tẩy vàng", "Cặp vàng"], a: 0 },
+                    { q: "(Nghe) Hoạt động:", l: "Open your book, please.", o: ["Đóng sách", "Mở sách", "Đứng lên", "Ngồi xuống"], a: 1 }
+                ]
+            },
+            18: {
+                title: "ĐỀ THI SỐ 18 (Cơ thể, Toán đố, Trang phục)",
+                questions: [
+                    { q: "You see with your _____.", o: ["Ears", "Nose", "Mouth", "Eyes"], a: 3 },
+                    { q: "You hear with your _____.", o: ["Ears", "Nose", "Hands", "Eyes"], a: 0 },
+                    { q: "You have ten _____ on your hands.", o: ["Toes", "Fingers", "Legs", "Arms"], a: 1 },
+                    { q: "When it is cold, you wear a _____.", o: ["T-shirt", "Shorts", "Jacket", "Skirt"], a: 2 },
+                    { q: "You wear these on your feet.", o: ["Hats", "Gloves", "Shoes", "Shirts"], a: 2 },
+                    { q: "A _____ is for girls to wear.", o: ["Tie", "Dress", "Trousers", "Suit"], a: 1 },
+                    { q: "_____ is your name?", o: ["How", "What", "Who", "Where"], a: 1 },
+                    { q: "_____ old are you?", o: ["How", "What", "Who", "When"], a: 0 },
+                    { q: "She _____ wearing a pink dress.", o: ["am", "is", "are", "do"], a: 1 },
+                    { q: "These _____ my shoes.", o: ["is", "am", "are", "be"], a: 2 },
+                    { q: "35 + 10 = ?", o: ["40", "45", "50", "55"], a: 1 },
+                    { q: "50 - 25 = ?", o: ["15", "20", "25", "30"], a: 2 },
+                    { q: "A cat has 2 ears. How many ears do 4 cats have?", o: ["6", "8", "10", "12"], a: 1 },
+                    { q: "There are 5 cars. Each car has 4 wheels. Total wheels?", o: ["10", "15", "20", "25"], a: 2 },
+                    { q: "10 + 12 + 5 = ?", o: ["25", "26", "27", "28"], a: 2 },
+                    { q: "Find the missing number: 5, 10, 15, _, 25", o: ["16", "18", "20", "22"], a: 2 },
+                    { q: "You have 30 candies. You eat 10. How many left?", o: ["10", "20", "30", "40"], a: 1 },
+                    { q: "14 - 7 = ?", o: ["5", "6", "7", "8"], a: 2 },
+                    { q: "What is 20 plus 15? (20 + 15)", o: ["25", "35", "45", "55"], a: 1 },
+                    { q: "Which number is an odd number? (Số lẻ)", o: ["2", "4", "6", "7"], a: 3 },
+                    { q: "18 + 2 = ?", o: ["19", "20", "21", "22"], a: 1 },
+                    { q: "My _____ hurts. (Đau đầu)", o: ["Head", "Shoe", "Shirt", "Pencil"], a: 0 },
+                    { q: "Point to your _____ (Đầu gối).", o: ["Knees", "Eyes", "Ears", "Nose"], a: 0 },
+                    { q: "Find the odd one out:", o: ["Shirt", "Skirt", "Hat", "Apple"], a: 3 },
+                    { q: "(Nghe) Bộ phận nào?", l: "Touch your shoulders.", o: ["Mũi", "Tai", "Vai", "Đầu gối"], a: 2 },
+                    { q: "(Nghe) Trang phục gì?", l: "I am wearing a blue T-shirt.", o: ["Áo thun xanh", "Áo khoác xanh", "Quần xanh", "Mũ xanh"], a: 0 },
+                    { q: "(Nghe) Phép tính:", l: "Thirty minus ten equals twenty.", o: ["30-10=20", "30+10=40", "20-10=10", "13-10=3"], a: 0 },
+                    { q: "(Nghe) Toán đố:", l: "Two boys have four legs.", o: ["2 chân", "4 chân", "6 chân", "8 chân"], a: 1 },
+                    { q: "(Nghe) Đại từ:", l: "These are my hands.", o: ["Bàn chân", "Bàn tay", "Đôi mắt", "Cái tai"], a: 1 },
+                    { q: "(Nghe) Màu sắc quần áo:", l: "She has red shoes.", o: ["Giày đỏ", "Mũ đỏ", "Áo đỏ", "Váy đỏ"], a: 0 }
+                ]
+            },
+            19: {
+                title: "ĐỀ THI SỐ 19 (Phương tiện, Thời tiết, Đại từ)",
+                questions: [
+                    { q: "A very big vehicle on the sea is a _____.", o: ["Car", "Train", "Ship", "Bus"], a: 2 },
+                    { q: "You fly in the sky in an _____.", o: ["Airplane", "Boat", "Bicycle", "Motorbike"], a: 0 },
+                    { q: "A vehicle with two wheels that you pedal.", o: ["Car", "Bus", "Bicycle", "Train"], a: 2 },
+                    { q: "When you need an umbrella, the weather is _____.", o: ["Sunny", "Rainy", "Windy", "Hot"], a: 1 },
+                    { q: "In winter, the weather is very _____.", o: ["Hot", "Warm", "Cold", "Sunny"], a: 2 },
+                    { q: "You wear sunglasses when it is _____.", o: ["Rainy", "Cloudy", "Snowy", "Sunny"], a: 3 },
+                    { q: "_____ is a pen. (Ở gần)", o: ["This", "That", "Those", "They"], a: 0 },
+                    { q: "_____ are birds in the sky. (Ở xa, số nhiều)", o: ["This", "That", "These", "Those"], a: 3 },
+                    { q: "What is _____? - It is a star.", o: ["these", "those", "that", "they"], a: 2 },
+                    { q: "Are they dogs? - No, they _____.", o: ["are", "aren't", "is", "isn't"], a: 1 },
+                    { q: "What time is it? (09:00)", o: ["Eight o'clock", "Nine o'clock", "Ten o'clock", "Eleven o'clock"], a: 1 },
+                    { q: "The day after Tuesday is _____.", o: ["Monday", "Wednesday", "Thursday", "Friday"], a: 1 },
+                    { q: "40 + 5 + 3 = ?", o: ["45", "46", "47", "48"], a: 3 },
+                    { q: "38 - 8 = ?", o: ["20", "30", "40", "50"], a: 1 },
+                    { q: "I have $10. I buy a toy for $4. How much is left?", o: ["$4", "$5", "$6", "$7"], a: 2 },
+                    { q: "How many days in a week?", o: ["5", "6", "7", "8"], a: 2 },
+                    { q: "17 + 13 = ?", o: ["20", "25", "30", "35"], a: 2 },
+                    { q: "Which is the smallest number? (Số nhỏ nhất)", o: ["41", "24", "15", "36"], a: 2 },
+                    { q: "Find the missing number: 10, 20, _, 40", o: ["25", "30", "35", "50"], a: 1 },
+                    { q: "100 - 50 = ?", o: ["40", "50", "60", "70"], a: 1 },
+                    { q: "If yesterday was Sunday, today is _____.", o: ["Saturday", "Monday", "Tuesday", "Friday"], a: 1 },
+                    { q: "22 + 22 = ?", o: ["40", "42", "44", "46"], a: 2 },
+                    { q: "A _____ goes on tracks. (Chạy trên đường ray)", o: ["Car", "Boat", "Train", "Plane"], a: 2 },
+                    { q: "Snow is _____.", o: ["Black", "Green", "White", "Red"], a: 2 },
+                    { q: "(Nghe) Phương tiện gì?", l: "I go to school by bus.", o: ["Xe đạp", "Ô tô", "Xe buýt", "Đi bộ"], a: 2 },
+                    { q: "(Nghe) Thời tiết ra sao?", l: "It is windy today.", o: ["Trời gió", "Trời mưa", "Trời nắng", "Trời tuyết"], a: 0 },
+                    { q: "(Nghe) Đại từ:", l: "Those are my kites.", o: ["Kia là những con diều", "Đây là con diều", "Đó là xe hơi", "Kia là quả bóng"], a: 0 },
+                    { q: "(Nghe) Giờ giấc:", l: "It is seven o'clock.", o: ["6:00", "7:00", "8:00", "9:00"], a: 1 },
+                    { q: "(Nghe) Tiền tệ:", l: "The apple is two dollars.", o: ["$1", "$2", "$3", "$4"], a: 1 },
+                    { q: "(Nghe) Thứ mấy?", l: "Today is Friday.", o: ["Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"], a: 2 }
+                ]
+            },
+            20: {
+                title: "ĐỀ THI SỐ 20 (Tổng hợp IQ, Nghề nghiệp, Không gian)",
+                questions: [
+                    { q: "Who teaches students in a school?", o: ["Doctor", "Teacher", "Farmer", "Driver"], a: 1 },
+                    { q: "Who helps sick people?", o: ["Doctor", "Singer", "Pilot", "Chef"], a: 0 },
+                    { q: "Where does your mother cook food?", o: ["Bedroom", "Bathroom", "Living room", "Kitchen"], a: 3 },
+                    { q: "Where do you take a shower?", o: ["Garden", "Bathroom", "Kitchen", "Bedroom"], a: 1 },
+                    { q: "A fish can _____, but it cannot fly.", o: ["Run", "Walk", "Swim", "Jump"], a: 2 },
+                    { q: "A bird can _____, but it cannot read.", o: ["Fly", "Speak", "Write", "Cook"], a: 0 },
+                    { q: "She _____ TV every evening.", o: ["watch", "watches", "watching", "is watch"], a: 1 },
+                    { q: "Look! The dog is _____ over the fence. (Đang nhảy)", o: ["jump", "jumps", "jumping", "jumped"], a: 2 },
+                    { q: "_____ you swim? - Yes, I can.", o: ["Do", "Are", "Can", "Is"], a: 2 },
+                    { q: "My father is _____ a book now.", o: ["read", "reads", "reading", "to read"], a: 2 },
+                    { q: "Find the next shape: 〇, △, 〇, △, _", o: ["〇", "△", "□", "☆"], a: 0 },
+                    { q: "25 + 25 = ?", o: ["40", "45", "50", "55"], a: 2 },
+                    { q: "What is double 10? (Gấp đôi 10)", o: ["10", "20", "30", "40"], a: 1 },
+                    { q: "What is half of 100?", o: ["25", "50", "75", "100"], a: 1 },
+                    { q: "There are 3 boxes. Each box has 5 balls. Total balls?", o: ["8", "10", "15", "20"], a: 2 },
+                    { q: "48 - 24 = ?", o: ["20", "22", "24", "26"], a: 2 },
+                    { q: "Which month comes first in a year?", o: ["February", "December", "January", "March"], a: 2 },
+                    { q: "10 + 20 + 15 = ?", o: ["35", "40", "45", "50"], a: 2 },
+                    { q: "How many letters are in the word 'ELEPHANT'?", o: ["6", "7", "8", "9"], a: 2 },
+                    { q: "99 + 1 = ?", o: ["98", "90", "100", "101"], a: 2 },
+                    { q: "If I have 2 tens and 3 ones, what number is it? (2 chục 3 đơn vị)", o: ["5", "32", "23", "20"], a: 2 },
+                    { q: "Who flies an airplane?", o: ["Doctor", "Pilot", "Farmer", "Chef"], a: 1 },
+                    { q: "A sofa is usually in the _____.", o: ["Bathroom", "Kitchen", "Living room", "Garden"], a: 2 },
+                    { q: "100 - 1 = ?", o: ["90", "98", "99", "101"], a: 2 },
+                    { q: "(Nghe) Nghề nghiệp:", l: "He is a brave policeman.", o: ["Cảnh sát", "Bác sĩ", "Thợ xây", "Nông dân"], a: 0 },
+                    { q: "(Nghe) Phòng nào trong nhà?", l: "I sleep in the bedroom.", o: ["Phòng khách", "Phòng bếp", "Phòng tắm", "Phòng ngủ"], a: 3 },
+                    { q: "(Nghe) Đang làm gì?", l: "She is singing a song.", o: ["Đang nhảy", "Đang hát", "Đang vẽ", "Đang ăn"], a: 1 },
+                    { q: "(Nghe) Toán IQ:", l: "Double five is ten.", o: ["5+5=10", "5+2=7", "10-5=5", "10+10=20"], a: 0 },
+                    { q: "(Nghe) Khả năng:", l: "A monkey can climb trees.", o: ["Bơi", "Bay", "Trèo cây", "Chạy"], a: 2 },
+                    { q: "(Nghe) Tháng mấy?", l: "My birthday is in January.", o: ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4"], a: 0 }
+                ]
+            }
+        };
+
+        let currentTestIndex = 16;
+        let timerInterval;
+        let timeRemaining;
+        let audioCtx = null;
+        
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function playSound(type) {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            if (type === 'correct') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(1400, audioCtx.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.25);
+            } else {
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(250, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.25);
+                gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.35);
+            }
+        }
+
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US'; utterance.rate = 0.8;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("Trình duyệt không hỗ trợ phát âm thanh.");
+            }
+        }
+
+        window.startTest = function(index) {
+            initAudio(); 
+            currentTestIndex = index;
+            document.getElementById('menuContainer').style.display = 'none';
+            document.getElementById('quizWrapper').style.display = 'block';
+            document.getElementById('submitBtn').style.display = 'block';
+            document.getElementById('backBtn').style.display = 'none';
+            document.getElementById('result').style.display = 'none';
+            
+            const test = allTests[index];
+            document.getElementById('testTitle').innerText = test.title;
+            
+            // Xáo trộn vị trí 30 câu trong đề hiện tại để mỗi lần làm lại đều có cảm giác mới
+            let shuffledQuestions = [...test.questions];
+            for (let i = shuffledQuestions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffledQuestions[i], shuffledQuestions[j]] = [shuffledQuestions[j], shuffledQuestions[i]];
+            }
+            test.currentShuffled = shuffledQuestions;
+            
+            renderQuestions(shuffledQuestions);
+            
+            timeRemaining = 20 * 60; 
+            clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+            updateTimer();
+            window.scrollTo(0, 0);
+        };
+
+        function updateTimer() {
+            let m = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
+            let s = (timeRemaining % 60).toString().padStart(2, '0');
+            document.getElementById('timeDisplay').innerText = `⏱ ${m}:${s}`;
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                submitQuiz();
+            }
+            timeRemaining--;
+        }
+
+        function renderQuestions(questions) {
+            const container = document.getElementById('quizContainer');
+            container.innerHTML = '';
+            
+            questions.forEach((item, index) => {
+                let listenHTML = item.l ? `<button class="btn-listen" type="button" onclick="speakText('${item.l}')">🎧 Bấm để nghe Audio</button>` : '';
+                
+                let optionsHTML = item.o.map((opt, i) => `
+                    <li>
+                        <label id="lbl_q${index}_opt${i}">
+                            <input type="radio" name="q${index}" value="${i}"> ${opt}
+                        </label>
+                    </li>
+                `).join('');
+
+                container.innerHTML += `
+                    <div class="question-card" id="card_q${index}">
+                        <div class="question-title">Câu ${index + 1}: ${item.q}</div>
+                        ${listenHTML}
+                        <ul class="options">${optionsHTML}</ul>
+                    </div>
+                `;
+            });
+        }
+
+        window.submitQuiz = function() {
+            clearInterval(timerInterval);
+            const test = allTests[currentTestIndex];
+            const questions = test.currentShuffled;
+            let score = 0;
+            let correctCount = 0;
+
+            questions.forEach((item, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                const labels = document.querySelectorAll(`input[name="q${index}"]`);
+                
+                document.getElementById(`lbl_q${index}_opt${item.a}`).classList.add('correct-ans');
+
+                if (selected) {
+                    if (parseInt(selected.value) === item.a) {
+                        score += 10; 
+                        correctCount++;
+                        playSound('correct');
+                    } else {
+                        document.getElementById(`lbl_q${index}_opt${selected.value}`).classList.add('wrong-ans');
+                        playSound('wrong');
+                    }
+                } else {
+                    playSound('wrong');
+                }
+                
+                labels.forEach(r => r.disabled = true);
+            });
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            document.getElementById('submitBtn').style.display = 'none';
+            document.getElementById('backBtn').style.display = 'block';
+
+            if (score >= 250) {
+                resultDiv.innerHTML = `🏆 TUYỆT ĐỈNH!<br>Duy Thức đạt ${score}/300 điểm (${correctCount}/30 câu). Con hoàn toàn làm chủ được kiến thức Vòng Quốc Gia!`;
+                resultDiv.style.backgroundColor = '#e8f5e9'; resultDiv.style.color = '#1b5e20';
+                startConfetti();
+            } else if (score >= 180) {
+                resultDiv.innerHTML = `👍 RẤT GIỎI!<br>Duy Thức đạt ${score}/300 điểm (${correctCount}/30 câu). Khả năng tập trung của con rất đáng khen!`;
+                resultDiv.style.backgroundColor = '#e3f2fd'; resultDiv.style.color = '#0d47a1';
+            } else {
+                resultDiv.innerHTML = `💪 KHÔNG SAO ĐÂU CHÀNG TRAI!<br>Duy Thức đạt ${score}/300 điểm (${correctCount}/30 câu).<br><span style="font-size: 16px; font-weight: normal; color: #424242;">Ba Đức hãy ôn lại các câu bôi đỏ cùng con nhé, đề này cực kỳ khó luôn!</span>`;
+                resultDiv.style.backgroundColor = '#fff3e0'; resultDiv.style.color = '#b71c1c';
+            }
+            window.scrollTo(0, 0);
+        };
+
+        window.backToMenu = function() {
+            document.getElementById('menuContainer').style.display = 'flex';
+            document.getElementById('quizWrapper').style.display = 'none';
+            window.scrollTo(0, 0);
+        };
+
+        function startConfetti() {
+            const canvas = document.getElementById('confettiCanvas');
+            canvas.style.display = 'block';
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            const particles = [];
+            for (let i = 0; i < 250; i++) particles.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height - canvas.height, size: Math.random() * 8 + 3, speed: Math.random() * 5 + 3, color: `hsl(${Math.random() * 360}, 100%, 50%)` });
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => { p.y += p.speed; if (p.y > canvas.height) p.y = -10; ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill(); });
+                requestAnimationFrame(animate);
+            }
+            animate();
+            setTimeout(() => { canvas.style.display = 'none'; }, 7000);
+        }
+    </script>
+</body>
+</html>
